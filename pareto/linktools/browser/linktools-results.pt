@@ -1,0 +1,147 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="knmp.im">
+  <head>
+    <metal:css fill-slot="css_slot">
+      <style type="text/css">
+
+        #uidfixer-results li {
+          list-style-type: none;
+        }
+
+        #uidfixer-results a.unresolved {
+          color: red;
+        }
+
+      </style>
+    </metal:css>
+  </head>
+  <body>
+    <metal:main fill-slot="content" tal:define="results view/results">
+
+      <h1 i18n:translate="title_linktool_results">
+        Link tool results
+      </h1>
+      <h2 i18n:translate="title_uidfixer_subresults">UID fixer results</h2>
+      <div tal:define="ufresults results/uidfixer_results" id="uidfixer-results">
+        <table border="1" style="font-size: 10px">
+          <thead>
+            <tr>
+              <th colspan="3">URL of document containing link</th>
+            </tr>
+            <tr>
+              <th>field</th>
+              <th>link href</th>
+              <th>found target url</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tal:block repeat="result ufresults">
+              <tr>
+                <td style="white-space: nowrap" colspan="3">
+                  <a tal:attributes="href result/object/absolute_url; class python:result['resolved'] and 'resolved' or 'unresolved'; style python:result['resolved'] and 'color: blue' or 'color: red'" tal:content="python: '...' + result['object'].absolute_url()[-80:]"></a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong tal:content="result/field/name|nothing"></strong>
+                </td>
+                <td style="white-space: nowrap">
+                  <em tal:content="result/href"></em>
+                </td>
+                <td style="white-space: nowrap">
+                  <a tal:attributes="href result/resolved_url" tal:content="result/resolved_url" tal:condition="result/resolved_url"></a>
+                  <em tal:condition="not:result/resolved_url">not resolved</em>
+                </td>
+              </tr>
+            </tal:block>
+          </tbody>
+        </table>
+        <strong>Total:</strong> <em tal:content="python:len(ufresults)"></em>
+        <strong>Broken:</strong> <em tal:content="python:len([r for r in ufresults if not r['resolved']])"></em>
+      </div>
+
+      <h2 i18n:translate="title_deadfiles_subresults">Dead files search results</h2>
+      <form action="deadfiles" method="post" id="dead-links-results">
+        <input type="checkbox" onchange="$('[name=remove]').attr('checked', this.checked)" />
+        <table border="1" style="font-size: 10px">
+          <thead>
+            <tr>
+              <th>&#xa0;</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tal:block repeat="result results/dead_files">
+              <tr>
+                <td>
+                  <input type="checkbox" name="remove" tal:attributes="value result" />
+                </td>
+                <td>
+                  <a tal:attributes="href result/url"
+                      tal:content="result/url"></a>
+                </td>
+              </tr>
+            </tal:block>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">
+                <strong>Total dead files:</strong>
+                <em tal:content="python:len(results['dead_files'])"></em>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="controls">
+          <input type="submit" name="remove-submit" value="Remove" />
+        </div>
+      </form>
+
+      <h2 i18n:translate="title_deadlinks_subresults">Dead links search results</h2>
+      <div tal:define="dlresults results/dead_links" id="deadlinks-results">
+        <table border="1" style="font-size: 10px">
+          <thead>
+            <tr>
+              <th colspan="3">URL of document containing link</th>
+            </tr>
+            <tr>
+              <th>field</th>
+              <th>link href</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tal:block repeat="result dlresults">
+              <tr>
+                <td colspan="2">
+                  <a tal:attributes="href result/object/absolute_url" tal:content="result/object/absolute_url"></a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong tal:content="result/field/name|nothing"></strong>
+                </td>
+                <td>
+                  <a tal:attributes="href result/href" tal:content="result/href"></a>
+                </td>
+              </tr>
+            </tal:block>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">
+                <strong>Working (resolveuid-)links:</strong> <em tal:content="python: len(results['linkuids'])"></em>
+                <strong>Dead links:</strong> <em tal:content="python: len(results['dead_links'])"></em>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </metal:main>
+  </body>
+</html>
+

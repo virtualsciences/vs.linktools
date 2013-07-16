@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="knmp.im">
+  <head>
+  </head>
+  <body>
+    <metal:main fill-slot="content">
+
+      <h1 i18n:translate="title_fix_links">
+        Fix links
+      </h1>
+      <p i18n:translate="msg_fix_links">
+        Find all relative and broken resolveuid links (absolute href
+        containing '/resolveuid/', most probably caused by Internet Explorer)
+        and try to create working resolveuid links out of them. Report relative
+        links that can not be resolved.
+      </p>
+      <form method="post">
+        <div class="field">
+          <input type="checkbox" name="dry" id="dry" />
+          <label for="dry">
+            Dry run (don't actually fix anything).
+          </label>
+        </div>
+        <div>
+          <input type="submit" name="submit" value="submit"
+                 i18n:domain="plone" i18n:attributes="value" />
+        </div>
+
+      </form>
+    </metal:main>
+  </body>
+</html>
