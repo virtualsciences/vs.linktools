@@ -66,12 +66,14 @@
       </div>
 
       <h2 i18n:translate="title_deadfiles_subresults">Dead files search results</h2>
-      <form action="deadfiles" method="post" id="dead-links-results">
-        <input type="checkbox" onchange="$('[name=remove]').attr('checked', this.checked)" />
+      <form action="@@linktools" method="post" id="dead-links-results">
+        <input type="hidden" name="dry" tal:attributes="dry python:request.get('dry') or ''" />
         <table border="1" style="font-size: 10px">
           <thead>
             <tr>
-              <th>&#xa0;</th>
+              <th>
+                <input type="checkbox" onchange="$('[name=remove:list]').attr('checked', this.checked)" />
+              </th>
               <th>URL</th>
             </tr>
           </thead>
@@ -79,7 +81,7 @@
             <tal:block repeat="result results/dead_files">
               <tr>
                 <td>
-                  <input type="checkbox" name="remove" tal:attributes="value result" />
+                  <input type="checkbox" name="remove:list" tal:attributes="value result/path" />
                 </td>
                 <td>
                   <a tal:attributes="href result/url"

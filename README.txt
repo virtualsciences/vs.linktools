@@ -1,7 +1,7 @@
 pareto.deadfiles
 ================
 
-Find all files to which there are no links anywhere in the Plone HTML.
+Find and fix dead links and files that are not linked to within a Plone site.
 
 
 Questions, remarks, etc.

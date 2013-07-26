@@ -9,6 +9,7 @@ from plone.app.redirector.interfaces import IRedirectionStorage
 
 from pareto.plonehtml import plonehtml
 from pareto.uidfixer import uidfixer
+from pareto.deadfiles import deadfiles
 
 
 class LinkTools(BrowserView):
@@ -17,10 +18,16 @@ class LinkTools(BrowserView):
 
     def __call__(self):
         portal = getToolByName(self.context, "portal_url").getPortalObject()
-        redirector = getUtility(IRedirectionStorage)
+        redirector = self.redirector = getUtility(IRedirectionStorage)
         self.uidfixer = uidfixer.UIDFixer(
             redirector, portal, ['www.knmp.nl', 'edit.knmp.nl', 'knmp.nl'])
-        if not self.request.get('submit'):
+        if self.request.get('remove-submit'):
+            toremove = self.request['remove']
+            for path in toremove:
+                path = path.split('/')
+                parent = self.context.restrictedTraverse(path[:-1])
+                parent.manage_delObjects([path[-1]])
+        elif not self.request.get('submit'):
             return self.template()
         return self.results_template()
 
@@ -55,14 +62,13 @@ class LinkTools(BrowserView):
         catalog = getToolByName(self.context, 'portal_catalog')
         items = catalog(portal_type=('File',))
         data['total_files'] = len(items)
-        for item in items:
-            # UID is in metadata, so we don't even have to retrieve our objects
-            if item.UID not in linkuids:
-                instance = item.getObject()
-                data['dead_files'].append({
-                    'uid': item.UID,
-                    'url': instance.absolute_url(),
-                    'path': '/'.join(instance.getPhysicalPath())})
+        dead_instances = deadfiles.find_dead_files(
+            self.context, linkuids, ('File',), self.redirector)
+        data['dead_files'] = [{
+            'uid': instance.UID(),
+            'url': instance.absolute_url(),
+            'path': '/'.join(instance.getPhysicalPath()),
+        } for instance in dead_instances]
 
         data['linkuids'] = linkuids
         return data
@@ -87,19 +93,14 @@ class LinkTools(BrowserView):
         fixeduids = [uid for (href, uid) in ufresults if uid]
         deadhrefs = [href for (href, uid) in ufresults if not uid]
 
-        ret['linkuids'] = fixeduids
         ret['dead_links'] = deadhrefs
 
-        # verify existing (also new, but whatever) resolveuid links
-        htmlcopy = html
-        while True:
-            match = self._reg_uid_href.search(htmlcopy)
-            if not match:
-                break
-            htmlcopy = htmlcopy.replace(match.group(0), '')
-            uid = match.group(1)
-            if uid in fixeduids:
-                continue
+        # now that we're pretty sure all internal links are proper resolveuid
+        # ones, verify all resolveuid links' UIDs (including those just
+        # generated, but doesn't matter) and store for determining whether
+        # we have dead files later
+        uids = ret['linkuids'] = deadfiles.find_uids(html, context)
+        for uid in uids:
             if not self.uidfixer.verify_uid(uid, context):
                 deadhrefs.append('resolveuid/%s' % (uid,))
 
