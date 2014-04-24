@@ -3,7 +3,7 @@ import os
 
 version = '0.1'
 
-setup(name='pareto.linktools',
+setup(name='vs.linktools',
       version=version,
       description="Library to find and fix dead links and files in a Plone site.",
       long_description=open("README.txt").read() + "\n" +
@@ -24,8 +24,8 @@ setup(name='pareto.linktools',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'pareto.uidfixer',
-          'pareto.deadfiles',
+          'vs.uidfixer',
+          'vs.deadfiles',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
