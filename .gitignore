@@ -3,6 +3,6 @@
 bin
 develop-eggs
 parts
-pareto.uidfixer.egg-info
+*.egg-info
 *.pyc
 dist

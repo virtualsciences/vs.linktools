@@ -1,4 +1,4 @@
-pareto.deadfiles
+vs.deadfiles
 ================
 
 Find and fix dead links and files that are not linked to within a Plone site.

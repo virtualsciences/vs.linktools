@@ -7,9 +7,9 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from plone.app.redirector.interfaces import IRedirectionStorage
 
-from pareto.plonehtml import plonehtml
-from pareto.uidfixer import uidfixer
-from pareto.deadfiles import deadfiles
+from vs.plonehtml import plonehtml
+from vs.uidfixer import uidfixer
+from vs.deadfiles import deadfiles
 
 
 class LinkTools(BrowserView):
@@ -77,7 +77,7 @@ class LinkTools(BrowserView):
     def _handler(self, html, context):
         """ this converts links to resolveuid and reports dead links and files
 
-            this basically combines pareto.uidfixer and pareto.deadfiles,
+            this basically combines vs.uidfixer and vs.deadfiles,
             with an added bonus that it reports dead links (all of them,
             not just the fixed ones like uidfixer does), and it's all
             done in a single pass

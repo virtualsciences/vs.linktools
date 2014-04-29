@@ -19,13 +19,14 @@ setup(name='vs.linktools',
       url='http://svn.plone.org/svn/collective/',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['pareto'],
+      namespace_packages=['vs'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
           'vs.uidfixer',
           'vs.deadfiles',
+          'vs.plonehtml',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
